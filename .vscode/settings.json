@@ -19,5 +19,10 @@
     "test/**/__snapshots__": true,
     "package-lock.json": true,
     "*.{css,sass,scss}.d.ts": true
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#223202",
+    "titleBar.activeBackground": "#2F4703",
+    "titleBar.activeForeground": "#F4FEE0"
   }
 }
