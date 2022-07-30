@@ -1,3 +1,6 @@
+# Database File
+sqlite3_database.db
+
 # Logs
 logs
 *.log

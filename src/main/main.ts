@@ -27,7 +27,7 @@ export default class AppUpdater {
 }
 
 const sqlite3 = sqlite.verbose();
-const db = new sqlite3.Database(':memory:');
+const db = new sqlite3.Database('sqlite3_database.db');
 
 db.serialize(() => {
   db.run('CREATE TABLE lorem (info TEXT)');
