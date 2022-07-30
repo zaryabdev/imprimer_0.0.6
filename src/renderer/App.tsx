@@ -11,6 +11,11 @@ const Hello = () => {
   });
 
   const [allRecords, setAllRecords] = useState([]);
+
+  function handleSelectedItem(item) {
+    console.log(item);
+    setItem(item);
+  }
   function handleInput(event: Event) {
     const name: String = event.target.name;
     const value: String = event.target.value;
@@ -88,7 +93,13 @@ const Hello = () => {
                   <tr key={record.id}>
                     <td>{record.id}</td>
                     <td>{record.name}</td>
-                    <td>{record.date_created}</td>
+                    <td>
+                      {record.date_created}
+                      <button onClick={() => handleSelectedItem(record)}>
+                        {' '}
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -104,6 +115,7 @@ const Hello = () => {
                   type="text"
                   className="u-full-width"
                   name="name"
+                  value={item.name}
                   onChange={(event) => {
                     return handleInput(event);
                   }}
@@ -115,6 +127,7 @@ const Hello = () => {
                 <label htmlFor="date_created">Date Created</label>
                 <input
                   readOnly
+                  value={item.date_created}
                   type="text"
                   className="u-full-width"
                   name="date_created"
