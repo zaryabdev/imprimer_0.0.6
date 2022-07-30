@@ -17,40 +17,37 @@ import log from 'electron-log';
 import sqlite from 'sqlite3';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { Promise } from 'bluebird';
+import AppDAO from './dao';
+import BillRepository from './bill_repository';
+import ItemRepository from './item_repository';
 
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    // autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
-const sqlite3 = sqlite.verbose();
-const db = new sqlite3.Database('sqlite3_database.db');
-
-db.serialize(() => {
-  db.run('CREATE TABLE lorem (info TEXT)');
-
-  const stmt = db.prepare('INSERT INTO lorem VALUES (?)');
-  for (let i = 0; i < 10; i += 1) {
-    stmt.run(`Ipsum ${i}`);
-  }
-  stmt.finalize();
-
-  db.each('SELECT rowid AS id, info FROM lorem', (_err, row) => {
-    console.log(`${row.id}: ${row.info}`);
-  });
-});
-
-db.close();
+// const sqlite3 = sqlite.verbose();
+// const db = new sqlite3.Database('sqlite3_database.db');
+const dao = new AppDAO('sqlite3_database.db');
+let currentBillId;
+const billOne = {
+  name: `Customer One ${Math.floor(Math.random() * 10) + 1}`,
+};
+const billRepo = new BillRepository(dao);
+const itemRepo = new ItemRepository(dao);
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('ipc-example', async (event, mainData) => {
+  console.log('Inside Main ipc-example');
+  console.log({ mainData });
+  billRepo.createTable().then(() => billRepo.create(mainData.name));
+  let demoArr = ['1', '2', '3'];
+  event.reply('ipc-example', demoArr);
 });
 
 if (process.env.NODE_ENV === 'production') {

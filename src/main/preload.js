@@ -2,8 +2,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    myPing() {
-      ipcRenderer.send('ipc-example', 'ping');
+    myPing(preloadData) {
+      console.log("Inside preload ipc-example")
+      console.log({preloadData})
+
+      ipcRenderer.send('ipc-example', preloadData);
     },
     on(channel, func) {
       const validChannels = ['ipc-example'];
