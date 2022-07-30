@@ -21,6 +21,7 @@ import { Promise } from 'bluebird';
 import AppDAO from './dao';
 import BillRepository from './bill_repository';
 import ItemRepository from './item_repository';
+import console from 'console';
 
 export default class AppUpdater {
   constructor() {
@@ -48,6 +49,32 @@ ipcMain.on('ipc-example', async (event, mainData) => {
   billRepo.createTable().then(() => billRepo.create(mainData.name));
   let demoArr = ['1', '2', '3'];
   event.reply('ipc-example', demoArr);
+});
+
+ipcMain.on('create:bill', async (event, mainData) => {
+  console.log('Inside Main create:bill');
+  console.log({ mainData });
+  billRepo.createTable().then(() => billRepo.create(mainData.name));
+  let demoArr = ['1', '2', '3'];
+  event.reply('create:bill', demoArr);
+});
+ipcMain.on('delete:bill', async (event, mainData) => {
+  console.log('Inside Main delete:bill');
+  console.log({ mainData });
+  billRepo.delete(mainData);
+  let demoArr = ['1', '2', '3'];
+  event.reply('delete:bill', demoArr);
+});
+ipcMain.on('get:bills', async (event, mainData) => {
+  console.log('Inside Main get:bills');
+  console.log({ mainData });
+  let resultSet;
+  billRepo.getAll().then((promiseData) => {
+    console.log({ promiseData });
+    resultSet = promiseData;
+    event.reply('get:bills', resultSet);
+  });
+  // console.log({ resultSet });
 });
 
 if (process.env.NODE_ENV === 'production') {
