@@ -27,7 +27,7 @@ export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    // autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
@@ -43,59 +43,6 @@ const itemRepo = new ItemRepository(dao);
 billRepo.createTable();
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('create:bill', async (event, mainData) => {
-  console.log('Inside Main create:bill');
-  console.log({ mainData });
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
-  win.setTitle(mainData.name);
-  billRepo.create(mainData.name).then((result) => {
-    console.log('result from create:bill sql');
-    console.log({ result });
-    win.webContents.send('create:bill', result);
-  });
-});
-
-ipcMain.on('update:bill', async (event, mainData) => {
-  console.log('Inside Main update:bill');
-  console.log({ mainData });
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
-  // event.reply('update:bill', mainData);
-  billRepo.update(mainData).then((result) => {
-    console.log('result from update:bill sql');
-    console.log({ result });
-    win.webContents.send('update:bill', result);
-  });
-});
-
-ipcMain.on('delete:bill', async (event, mainData) => {
-  console.log('Inside Main delete:bill');
-  console.log({ mainData });
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
-  billRepo.delete(mainData).then((result) => {
-    console.log('result from delete:bill sql');
-    console.log({ result });
-    win.webContents.send('delete:bill', result);
-  });
-});
-
-ipcMain.on('get:bills', async (event, mainData) => {
-  console.log('Inside Main get:bills');
-  console.log({ mainData });
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
-  let resultSet;
-  billRepo.getAll().then((promiseData) => {
-    // console.log({ promiseData });
-    resultSet = promiseData;
-    // event.reply('get:bills', resultSet);
-    win.webContents.send('get:bills', resultSet);
-  });
-  // console.log({ resultSet });
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -173,12 +120,65 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**
  * Add event listeners...
  */
+
+ipcMain.on('create:bill', async (event, mainData) => {
+  console.log('Inside Main create:bill');
+  console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  win.setTitle(mainData.name);
+  billRepo.create(mainData.name).then((result) => {
+    console.log('result from create:bill sql');
+    console.log({ result });
+    win.webContents.send('create:bill', result);
+  });
+});
+
+ipcMain.on('update:bill', async (event, mainData) => {
+  console.log('Inside Main update:bill');
+  console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  // event.reply('update:bill', mainData);
+  billRepo.update(mainData).then((result) => {
+    console.log('result from update:bill sql');
+    console.log({ result });
+    win.webContents.send('update:bill', result);
+  });
+});
+
+ipcMain.on('delete:bill', async (event, mainData) => {
+  console.log('Inside Main delete:bill');
+  console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  billRepo.delete(mainData).then((result) => {
+    console.log('result from delete:bill sql');
+    console.log({ result });
+    win.webContents.send('delete:bill', result);
+  });
+});
+
+ipcMain.on('get:bills', async (event, mainData) => {
+  console.log('Inside Main get:bills');
+  console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  let resultSet;
+  billRepo.getAll().then((promiseData) => {
+    // console.log({ promiseData });
+    resultSet = promiseData;
+    // event.reply('get:bills', resultSet);
+    win.webContents.send('get:bills', resultSet);
+  });
+  // console.log({ resultSet });
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
