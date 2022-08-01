@@ -13,13 +13,13 @@ const Setup = () => {
   });
 
   useEffect(() => {
-    // getAllBills();
+    getAllBills();
   }, []);
 
-  function handleSelectedItem(item) {
+  const handleSelectedItem = (item) => {
     console.log(item);
     setSelectedItem(item);
-  }
+  };
   const handleInput = (event: Event) => {
     const name: String = event.target.name;
     const value: String = event.target.value;
@@ -29,23 +29,36 @@ const Setup = () => {
     }));
   };
 
-  const createBill = () => {
-    console.log('Going to call createBill');
-    window.electron.ipcRenderer.createBill(selectedItem);
-
-    window.electron.ipcRenderer.on('create:bill', (responseData) => {
-      console.log('create:bill event respose');
-      console.log({ responseData });
-      // getAllBills();
+  const addNew = () => {
+    setSelectedItem({
+      id: '',
+      name: '',
+      date_created: '',
     });
   };
+
+  const createBill = (item) => {
+    console.log('Going to call createBill');
+    console.log({ item });
+    window.electron.ipcRenderer.createBill(item);
+
+    window.electron.ipcRenderer.on('create:bill', (responseData) => {
+      console.log('create:bill event response');
+      console.log({ responseData });
+      console.log('Going to call getAllBills from createBill');
+      getAllBills();
+    });
+  };
+
   const updateBill = (item) => {
     console.log('Going to call updateBill');
     console.log({ item });
     window.electron.ipcRenderer.updateBill(item);
 
     window.electron.ipcRenderer.on('update:bill', (responseData) => {
+      console.log('create:bill event response');
       console.log({ responseData });
+      console.log('Going to call getAllBills from updateBill');
       getAllBills();
     });
   };
@@ -54,16 +67,21 @@ const Setup = () => {
     window.electron.ipcRenderer.deleteBill(id);
 
     window.electron.ipcRenderer.on('delete:bill', (responseData) => {
+      console.log('create:bill event response');
       console.log({ responseData });
+      console.log('Going to call getAllBills from deleteBill');
+      addNew();
       getAllBills();
     });
   };
 
-  const getAllBills = () => {
+  const getAllBills = (callback) => {
+    debugger;
     console.log('Going to call getAllBills');
     window.electron.ipcRenderer.getAllBills();
 
     window.electron.ipcRenderer.on('get:bills', (responseData) => {
+      console.log('get:bills event response');
       console.log({ responseData });
       setAllRecords(responseData);
     });
@@ -71,11 +89,11 @@ const Setup = () => {
 
   return (
     <div className="container p-4">
-      <div className="row">
+      {/* <div className="row">
         <div className="twelve columns">
-          <h1>Setup</h1>
+          <h1>CRUD</h1>
         </div>
-      </div>
+      </div> */}
       <div className="row">
         <div className="eight columns">
           <table className="u-full-width">
@@ -84,6 +102,7 @@ const Setup = () => {
                 <th>ID</th>
                 <th>Name</th>
                 <th>Date Created</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -92,10 +111,14 @@ const Setup = () => {
                   <tr key={record.id}>
                     <td>{record.id}</td>
                     <td>{record.name}</td>
+                    <td>{record.date_created}</td>
                     <td>
-                      {record.date_created}
-                      <button onClick={() => handleSelectedItem(record)}>
-                        {' '}
+                      <button
+                        className={`${
+                          selectedItem.id === record.id ? 'button-primary' : ' '
+                        }`}
+                        onClick={() => handleSelectedItem(record)}
+                      >
                         Edit
                       </button>
                     </td>
@@ -106,6 +129,18 @@ const Setup = () => {
           </table>
         </div>
         <div className="four columns">
+          <div className="row">
+            <div className="twelve columns">
+              <label htmlFor="date_created">ID</label>
+              <input
+                readOnly
+                value={selectedItem.id}
+                type="text"
+                className="u-full-width is-disabled in-active"
+                name="id"
+              />
+            </div>
+          </div>
           <div className="row">
             <div className="twelve columns">
               <label htmlFor="name">Name</label>
@@ -127,29 +162,60 @@ const Setup = () => {
                 readOnly
                 value={selectedItem.date_created}
                 type="text"
-                className="u-full-width"
+                className="u-full-width is-disabled in-active"
                 name="date_created"
               />
             </div>
           </div>
-          {JSON.stringify(selectedItem, null, 2)}
           <div className="row">
             <div className="four columns">
-              <button className="button-primary" onClick={() => createBill()}>
+              <button
+                className="button-primary"
+                onClick={() => addNew()}
+                disabled={selectedItem.name === ''}
+              >
                 Create
               </button>
             </div>
-            <div className="four columns">
-              <button
-                className="button-primary"
-                onClick={() => updateBill(selectedItem)}
-              >
-                Update
-              </button>
+          </div>
+          {selectedItem.id !== '' && (
+            <div className="row">
+              <div className="four columns">
+                <button
+                  className={`button-primary ${
+                    selectedItem.name === '' ? 'is-disabled' : ''
+                  }`}
+                  onClick={() => updateBill(selectedItem)}
+                  disabled={selectedItem.name === '' ? true : false}
+                >
+                  Update
+                </button>
+              </div>
             </div>
+          )}
+          {selectedItem.id === '' && (
+            <div className="row">
+              <div className="four columns">
+                <button
+                  className={`button-primary ${
+                    selectedItem.name === '' ? 'is-disabled' : ''
+                  }`}
+                  onClick={() => createBill(selectedItem)}
+                  disabled={selectedItem.name === '' ? true : false}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="row">
             <div className="four columns">
               <button
-                className="button-primary"
+                className={`button-primary ${
+                  selectedItem.id === '' ? 'is-disabled' : ''
+                }`}
+                disabled={selectedItem.id === '' ? true : false}
                 onClick={() => deleteBill(selectedItem.id)}
               >
                 Delete

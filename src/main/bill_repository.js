@@ -26,13 +26,8 @@ class BillRepository {
         let resultSet = this.dao.run(
             `UPDATE bills SET name = ? WHERE id = ?`,
             [name, id]
-        ).then( resultSet => {
-            // console.log({resultSet})
-            return resultSet
-        } );
-        ;
-        // console.log({resultSet})
-
+        )
+        console.log({resultSet})
         return resultSet
     }
 

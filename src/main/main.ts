@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import sqlite from 'sqlite3';
@@ -47,37 +47,52 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.on('create:bill', async (event, mainData) => {
   console.log('Inside Main create:bill');
   console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  win.setTitle(mainData.name);
   billRepo.create(mainData.name).then((result) => {
     console.log('result from create:bill sql');
     console.log({ result });
-    event.reply('create:bill', result);
+    win.webContents.send('create:bill', result);
   });
 });
 
 ipcMain.on('update:bill', async (event, mainData) => {
   console.log('Inside Main update:bill');
   console.log({ mainData });
-  billRepo.update(mainData);
-  let demoArr = ['1', '2', '3'];
-  event.reply('update:bill', demoArr);
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  // event.reply('update:bill', mainData);
+  billRepo.update(mainData).then((result) => {
+    console.log('result from update:bill sql');
+    console.log({ result });
+    win.webContents.send('update:bill', result);
+  });
 });
 
 ipcMain.on('delete:bill', async (event, mainData) => {
   console.log('Inside Main delete:bill');
   console.log({ mainData });
-  billRepo.delete(mainData);
-  let demoArr = ['1', '2', '3'];
-  event.reply('delete:bill', demoArr);
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  billRepo.delete(mainData).then((result) => {
+    console.log('result from delete:bill sql');
+    console.log({ result });
+    win.webContents.send('delete:bill', result);
+  });
 });
 
 ipcMain.on('get:bills', async (event, mainData) => {
   console.log('Inside Main get:bills');
   console.log({ mainData });
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
   let resultSet;
   billRepo.getAll().then((promiseData) => {
     // console.log({ promiseData });
     resultSet = promiseData;
-    event.reply('get:bills', resultSet);
+    // event.reply('get:bills', resultSet);
+    win.webContents.send('get:bills', resultSet);
   });
   // console.log({ resultSet });
 });
