@@ -1,27 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
-
-contextBridge.exposeInMainWorld('electron', {
+const WINDOW_API = {
   ipcRenderer: {
-    myPing(preloadData) {
-      console.log("Inside preload ipc-example")
-      console.log({preloadData})
-
-      ipcRenderer.send('ipc-example', preloadData);
-    },
-    on(channel, func) {
-      const validChannels = ['ipc-example'];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.on(channel, (event, ...args) => func(...args));
-      }
-    },
-    once(channel, func) {
-      const validChannels = ['ipc-example'];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.once(channel, (event, ...args) => func(...args));
-      }
-    },
     createBill(preloadData) {
       console.log("Inside preload create:bill")
       console.log({preloadData})
@@ -30,6 +9,8 @@ contextBridge.exposeInMainWorld('electron', {
     },
     on(channel, func) {
       const validChannels = ['create:bill'];
+      console.log(`Inside Channel on create:bill`);
+
       if (validChannels.includes(channel)) {
         // Deliberately strip event as it includes `sender`
         ipcRenderer.on(channel, (event, ...args) => func(...args));
@@ -37,6 +18,27 @@ contextBridge.exposeInMainWorld('electron', {
     },
     once(channel, func) {
       const validChannels = ['create:bill'];
+      console.log(`Inside Channel once create:bill`);
+      if (validChannels.includes(channel)) {
+        // Deliberately strip event as it includes `sender`
+        ipcRenderer.once(channel, (event, ...args) => func(...args));
+      }
+    },
+    updateBill(preloadData) {
+      console.log("Inside preload update:bill")
+      console.log({preloadData})
+
+      ipcRenderer.send('update:bill', preloadData);
+    },
+    on(channel, func) {
+      const validChannels = ['update:bill'];
+      if (validChannels.includes(channel)) {
+        // Deliberately strip event as it includes `sender`
+        ipcRenderer.on(channel, (event, ...args) => func(...args));
+      }
+    },
+    once(channel, func) {
+      const validChannels = ['update:bill'];
       if (validChannels.includes(channel)) {
         // Deliberately strip event as it includes `sender`
         ipcRenderer.once(channel, (event, ...args) => func(...args));
@@ -83,4 +85,6 @@ contextBridge.exposeInMainWorld('electron', {
       }
     },
   },
-});
+}
+
+contextBridge.exposeInMainWorld('electron',WINDOW_API );

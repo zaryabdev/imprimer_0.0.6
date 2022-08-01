@@ -40,24 +40,28 @@ const billOne = {
 };
 const billRepo = new BillRepository(dao);
 const itemRepo = new ItemRepository(dao);
+billRepo.createTable();
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, mainData) => {
-  console.log('Inside Main ipc-example');
-  console.log({ mainData });
-  billRepo.createTable().then(() => billRepo.create(mainData.name));
-  let demoArr = ['1', '2', '3'];
-  event.reply('ipc-example', demoArr);
-});
 
 ipcMain.on('create:bill', async (event, mainData) => {
   console.log('Inside Main create:bill');
   console.log({ mainData });
-  billRepo.createTable().then(() => billRepo.create(mainData.name));
-  let demoArr = ['1', '2', '3'];
-  event.reply('create:bill', demoArr);
+  billRepo.create(mainData.name).then((result) => {
+    console.log('result from create:bill sql');
+    console.log({ result });
+    event.reply('create:bill', result);
+  });
 });
+
+ipcMain.on('update:bill', async (event, mainData) => {
+  console.log('Inside Main update:bill');
+  console.log({ mainData });
+  billRepo.update(mainData);
+  let demoArr = ['1', '2', '3'];
+  event.reply('update:bill', demoArr);
+});
+
 ipcMain.on('delete:bill', async (event, mainData) => {
   console.log('Inside Main delete:bill');
   console.log({ mainData });
@@ -65,12 +69,13 @@ ipcMain.on('delete:bill', async (event, mainData) => {
   let demoArr = ['1', '2', '3'];
   event.reply('delete:bill', demoArr);
 });
+
 ipcMain.on('get:bills', async (event, mainData) => {
   console.log('Inside Main get:bills');
   console.log({ mainData });
   let resultSet;
   billRepo.getAll().then((promiseData) => {
-    console.log({ promiseData });
+    // console.log({ promiseData });
     resultSet = promiseData;
     event.reply('get:bills', resultSet);
   });

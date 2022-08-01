@@ -1,9 +1,11 @@
 class BillRepository {
     constructor(dao) {
+        console.log(`constructor called`);
         this.dao = dao;
     }
 
     createTable() {
+        console.log(`createTable called`);
         const sql = `
       CREATE TABLE IF NOT EXISTS bills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,21 +14,30 @@ class BillRepository {
         return this.dao.run(sql);
     }
     create(name) {
-
+        console.log(`create called`);
         return this.dao.run(
             'INSERT INTO bills (name,date_created) VALUES (?,?)',
             [name, new Date()]);
     }
 
-    update(project) {
-        const { id, name } = project;
-        return this.dao.run(
+    update(item) {
+        console.log(`update called`);
+        const { id, name } = item;
+        let resultSet = this.dao.run(
             `UPDATE bills SET name = ? WHERE id = ?`,
             [name, id]
-        );
+        ).then( resultSet => {
+            // console.log({resultSet})
+            return resultSet
+        } );
+        ;
+        // console.log({resultSet})
+
+        return resultSet
     }
 
     delete(id) {
+        console.log(`delete called`);
         return this.dao.run(
             `DELETE FROM bills WHERE id = ?`,
             [id]
@@ -34,12 +45,14 @@ class BillRepository {
     }
 
     getById(id) {
+        console.log(`getById called`);
         return this.dao.get(
             `SELECT * FROM bills WHERE id = ?`,
             [id]);
     }
 
     getAll() {
+        console.log(`getAll called`);
         return this.dao.all(`SELECT * FROM bills`);
     }
 }

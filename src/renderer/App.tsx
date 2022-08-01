@@ -1,85 +1,84 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
 import './styles/skeleton.css';
-const Hello = () => {
-  const [item, setItem] = useState({
+
+const Setup = () => {
+  const [allRecords, setAllRecords] = useState([]);
+  const [selectedItem, setSelectedItem] = useState({
     id: '',
     name: '',
     date_created: '',
   });
 
-  const [allRecords, setAllRecords] = useState([]);
+  useEffect(() => {
+    // getAllBills();
+  }, []);
 
   function handleSelectedItem(item) {
     console.log(item);
-    setItem(item);
+    setSelectedItem(item);
   }
-  function handleInput(event: Event) {
+  const handleInput = (event: Event) => {
     const name: String = event.target.name;
     const value: String = event.target.value;
-    setItem((prevState) => ({
+    setSelectedItem((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-  }
-  function ping() {
-    window.electron.ipcRenderer.myPing(item);
+  };
 
-    window.electron.ipcRenderer.once('ipc-example', (responseData) => {
-      // eslint-disable-next-line no-console
-      console.log({ responseData });
-    });
-  }
-  function createBill() {
-    window.electron.ipcRenderer.createBill(item);
+  const createBill = () => {
+    console.log('Going to call createBill');
+    window.electron.ipcRenderer.createBill(selectedItem);
 
-    window.electron.ipcRenderer.once('create:bill', (responseData) => {
-      // eslint-disable-next-line no-console
+    window.electron.ipcRenderer.on('create:bill', (responseData) => {
+      console.log('create:bill event respose');
       console.log({ responseData });
+      // getAllBills();
     });
-  }
-  function deleteBill() {
-    window.electron.ipcRenderer.deleteBill(item.name);
+  };
+  const updateBill = (item) => {
+    console.log('Going to call updateBill');
+    console.log({ item });
+    window.electron.ipcRenderer.updateBill(item);
 
-    window.electron.ipcRenderer.once('delete:bill', (responseData) => {
-      // eslint-disable-next-line no-console
+    window.electron.ipcRenderer.on('update:bill', (responseData) => {
       console.log({ responseData });
+      getAllBills();
     });
-  }
-  function getAllBills() {
+  };
+  const deleteBill = (id) => {
+    console.log('Going to call deleteBill');
+    window.electron.ipcRenderer.deleteBill(id);
+
+    window.electron.ipcRenderer.on('delete:bill', (responseData) => {
+      console.log({ responseData });
+      getAllBills();
+    });
+  };
+
+  const getAllBills = () => {
+    console.log('Going to call getAllBills');
     window.electron.ipcRenderer.getAllBills();
 
-    window.electron.ipcRenderer.once('get:bills', (responseData) => {
-      // eslint-disable-next-line no-console
+    window.electron.ipcRenderer.on('get:bills', (responseData) => {
       console.log({ responseData });
       setAllRecords(responseData);
     });
-  }
+  };
 
   return (
     <div className="container p-4">
       <div className="row">
         <div className="twelve columns">
           <h1>Setup</h1>
-          <button className="button-primary" onClick={ping}>
-            Ping
-          </button>
-          <button className="button-primary" onClick={createBill}>
-            Create
-          </button>
-          <button className="button-primary" onClick={deleteBill}>
-            Delete
-          </button>
-          <button className="button-primary" onClick={getAllBills}>
-            Get All
-          </button>
         </div>
       </div>
       <div className="row">
         <div className="eight columns">
-          <table class="u-full-width">
+          <table className="u-full-width">
             <thead>
               <tr>
                 <th>ID</th>
@@ -107,44 +106,56 @@ const Hello = () => {
           </table>
         </div>
         <div className="four columns">
-          <form>
-            <div className="row">
-              <div className="twelve columns">
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  className="u-full-width"
-                  name="name"
-                  value={item.name}
-                  onChange={(event) => {
-                    return handleInput(event);
-                  }}
-                />
-              </div>
+          <div className="row">
+            <div className="twelve columns">
+              <label htmlFor="name">Name</label>
+              <input
+                type="text"
+                className="u-full-width"
+                name="name"
+                value={selectedItem.name}
+                onChange={(event) => {
+                  return handleInput(event);
+                }}
+              />
             </div>
-            <div className="row">
-              <div className="twelve columns">
-                <label htmlFor="date_created">Date Created</label>
-                <input
-                  readOnly
-                  value={item.date_created}
-                  type="text"
-                  className="u-full-width"
-                  name="date_created"
-                  onChange={(event) => {
-                    return handleInput(event);
-                  }}
-                />
-              </div>
+          </div>
+          <div className="row">
+            <div className="twelve columns">
+              <label htmlFor="date_created">Date Created</label>
+              <input
+                readOnly
+                value={selectedItem.date_created}
+                type="text"
+                className="u-full-width"
+                name="date_created"
+              />
             </div>
-            {JSON.stringify(item, null, 2)}
-            <div className="row">
-              <div className="six columns">
-                <button className="button-primary">Save</button>
-              </div>
-              <div className="six columns"></div>
+          </div>
+          {JSON.stringify(selectedItem, null, 2)}
+          <div className="row">
+            <div className="four columns">
+              <button className="button-primary" onClick={() => createBill()}>
+                Create
+              </button>
             </div>
-          </form>
+            <div className="four columns">
+              <button
+                className="button-primary"
+                onClick={() => updateBill(selectedItem)}
+              >
+                Update
+              </button>
+            </div>
+            <div className="four columns">
+              <button
+                className="button-primary"
+                onClick={() => deleteBill(selectedItem.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -154,7 +165,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Setup />} />
       </Routes>
     </Router>
   );
