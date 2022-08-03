@@ -3,23 +3,23 @@ import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import {
   FormOutlined,
   SettingOutlined,
-  FileOutlined,
   OrderedListOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Layout, Menu } from 'antd';
 import Setup from './imprimer/Setup';
 import Grid from './imprimer/GridSample';
-import './App.css';
-import './styles/skeleton.css';
+import PackingType from './imprimer/PackingType';
+import ProductName from './imprimer/ProductName';
 import 'antd/dist/antd.css';
+import './styles/skeleton.css';
+import './App.css';
 
 // import MainLayout from './imprimer/MainLayout';
 const { Content, Footer, Sider } = Layout;
 
 export default function App() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <Router>
@@ -28,6 +28,7 @@ export default function App() {
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
+          className="no-drag"
         >
           <div className="logo" />
           {/* <Menu
@@ -40,7 +41,7 @@ export default function App() {
             <Menu.Item key="grid">
               <FormOutlined />
               <span>Grid</span>
-              <Link to="/grid" />
+              <Link to="/" />
             </Menu.Item>
             <Menu.SubMenu
               title={
@@ -63,7 +64,7 @@ export default function App() {
             </Menu.SubMenu>
           </Menu>
         </Sider>
-        <Layout className="site-layout">
+        <Layout className="site-layout no-drag">
           <Content style={{ margin: '0 16px' }}>
             <div
               className="site-layout-background"
@@ -71,9 +72,8 @@ export default function App() {
             >
               <Routes>
                 <Route exact path="/" element={<Grid />} />
-                <Route path="/grid" element={<Grid />} />
-                <Route path="/packing_type" element={<Setup />} />
-                <Route path="/product_name" element={<Setup />} />
+                <Route path="/packing_type" element={<PackingType />} />
+                <Route path="/product_name" element={<ProductName />} />
               </Routes>
             </div>
           </Content>

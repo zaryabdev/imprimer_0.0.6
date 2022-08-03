@@ -5,3 +5,10 @@
 .in-active {
   background-color: #ebebeb !important;
 }
+
+.drag {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}

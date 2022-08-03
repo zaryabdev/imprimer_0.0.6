@@ -18,7 +18,7 @@ import {
 // import BillHeader from './BillHeader';
 // import { sendAsync, getBills, insertBill } from './message-control/renderer';
 import { Col, Row, Avatar, Descriptions } from 'antd';
-import { AntDesignOutlined } from '@ant-design/icons';
+import { HeartOutlined } from '@ant-design/icons';
 import 'react-datasheet-grid/dist/style.css';
 
 const Grid = () => {
@@ -101,7 +101,7 @@ const Grid = () => {
                 xl: 80,
                 xxl: 100,
               }}
-              icon={<AntDesignOutlined />}
+              icon={<HeartOutlined />}
             />
           </Col>
           <Col span={20}>
