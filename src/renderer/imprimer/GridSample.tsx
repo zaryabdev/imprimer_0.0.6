@@ -21,13 +21,49 @@ import { Col, Row, Avatar, Descriptions } from 'antd';
 import { HeartOutlined } from '@ant-design/icons';
 import 'react-datasheet-grid/dist/style.css';
 
+const PACKINTYPES = [];
+const PRODUCTNAMES = [];
+
 const Grid = () => {
   const [data, setData] = useState([{}, {}, {}]);
+
+  const getAllPackingTypes = () => {
+    console.log('Going to call getAllPackingTypes');
+    window.electron.ipcRenderer.getAllPackingTypes();
+
+    window.electron.ipcRenderer.on('get:packing_types', (responseData) => {
+      console.log('get:packing_types event response');
+      console.log('Indide Grid');
+      console.log({ responseData });
+      for (let i = 0; i < responseData.length; i++) {
+        PACKINTYPES.push(responseData[i].name);
+      }
+    });
+  };
+
+  const getAllProductNames = () => {
+    console.log('Going to call getAllProductNames');
+    window.electron.ipcRenderer.getAllProductNames();
+
+    window.electron.ipcRenderer.on('get:product_names', (responseData) => {
+      console.log('get:product_names event response');
+      console.log('Indide Grid');
+      console.log({ responseData });
+      for (let i = 0; i < responseData.length; i++) {
+        PRODUCTNAMES.push(responseData[i].name);
+      }
+    });
+  };
 
   function genId() {
     console.log(nanoid());
     // return genId();
   }
+
+  useEffect(() => {
+    getAllPackingTypes();
+    getAllProductNames();
+  }, []);
 
   useEffect(() => {
     // console.log(`final data`);
@@ -156,7 +192,8 @@ const PackingAutoFill = ({
   }, [focus, active]);
 
   function handleInput(e) {
-    const TYPE = ['DOZEN', 'PACKET', 'CARD', 'DABA', 'GURS', 'PIECE'];
+    // const TYPE = ['DOZEN', 'PACKET', 'CARD', 'DABA', 'GURS', 'PIECE'];
+    const TYPE = PACKINTYPES;
 
     const options = {
       includeScore: true,
@@ -221,32 +258,35 @@ const NameAutoFill = ({
   }, [focus, active]);
 
   function handleInput(e) {
-    const ITEMS = [
-      'CHORI',
-      'METAL CHUTKI',
-      'SET',
-      'HAIR BAND',
-      'PONI',
-      'PIN',
-      'GALA PATI',
-      'MALA',
-      'TOPAS',
-      'RING',
-      'KANTA',
-      'KARA',
-      'BINDIA',
-      'CHAIN',
-      'CLIP',
-      'BALI',
-      'BRACLET',
-      'LOKIT CHAIN',
-      'DORI',
-      'MATHA PATI',
-      'HAIR BAND',
-      'TAWAL PONI',
-      'PONI GIFT',
-      'PIN',
-    ];
+    // const ITEMS = [
+    //   'CHORI',
+    //   'METAL CHUTKI',
+    //   'SET',
+    //   'HAIR BAND',
+    //   'PONI',
+    //   'PIN',
+    //   'GALA PATI',
+    //   'MALA',
+    //   'TOPAS',
+    //   'RING',
+    //   'KANTA',
+    //   'KARA',
+    //   'BINDIA',
+    //   'CHAIN',
+    //   'CLIP',
+    //   'BALI',
+    //   'BRACLET',
+    //   'LOKIT CHAIN',
+    //   'DORI',
+    //   'MATHA PATI',
+    //   'HAIR BAND',
+    //   'TAWAL PONI',
+    //   'PONI GIFT',
+    //   'PIN',
+    // ];
+
+    const ITEMS = PRODUCTNAMES;
+
     const options = {
       includeScore: true,
       minMatchCharLength: 1,
